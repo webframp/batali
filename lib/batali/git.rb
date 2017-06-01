@@ -32,7 +32,7 @@ module Batali
     # @note this will update ref to SHA
     def ref_dup
       git = ::Git.open(base_path)
-      git.checkout(ref)
+      git.checkout(ref, :force => true)
       git.pull('origin', ref)
       self.ref = git.log.first.sha
       self.path = File.join(cache_path, 'git', ref)
