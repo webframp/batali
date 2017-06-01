@@ -17,7 +17,7 @@ module Batali
     def clone_repository
       if(File.directory?(base_path))
         repo = ::Git.open(base_path)
-        repo.checkout('master')
+        repo.checkout('master', :force => true)
         repo.pull
         repo.fetch
       else
