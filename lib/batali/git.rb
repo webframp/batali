@@ -17,7 +17,14 @@ module Batali
     def clone_repository
       if(File.directory?(base_path))
         repo = ::Git.open(base_path)
-        repo.checkout('master', :force => true)
+        Batali.ui.debug "#{__method__} repo: #{repo.remote.url}"
+        Batali.ui.debug "#{__method__} called with base #{base_path}"
+        repo.checkout('master')
+        repo.checkout_index(:all => true, :force => true)
+        if repo.status.changed.any?
+          Batali.ui.debug "#{__method__}: override commit"
+          repo.commit_all("Batali: commit from #{__method__}")
+        end
         repo.pull
         repo.fetch
       else
@@ -32,7 +39,14 @@ module Batali
     # @note this will update ref to SHA
     def ref_dup
       git = ::Git.open(base_path)
-      git.checkout(ref, :force => true)
+      Batali.ui.debug "#{__method__} repo: #{git.remote.url}"
+      Batali.ui.debug "#{__method__} called with base #{base_path}"
+      git.checkout(ref)
+      git.checkout_index(:all => true, :force => true)
+      if git.status.changed.any?
+        Batali.ui.debug "#{__method__}: override commit"
+        git.commit_all("Batali: commit from #{__method__}")
+      end
       git.pull('origin', ref)
       self.ref = git.log.first.sha
       self.path = File.join(cache_path, 'git', ref)
